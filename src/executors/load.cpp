@@ -56,3 +56,10 @@ void executeLOAD()
     }
     return;
 }
+
+void executeLOAD_MATRIX()
+{
+    logger.log("executeLOAD_MATRIX");
+    
+    return;
+}
