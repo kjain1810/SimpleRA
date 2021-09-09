@@ -6,6 +6,17 @@
 bool syntacticParseLOAD()
 {
     logger.log("syntacticParseLOAD");
+    if (tokenizedQuery.size() == 3)
+    {
+        if(tokenizedQuery[1] != "MATRIX")
+        {
+            cout << "SYNTAX ERROR" << endl;
+            return false;
+        }
+        parsedQuery.queryType = LOAD_MATRIX;
+        parsedQuery.loadRelationName = tokenizedQuery[2];
+        return true;
+    }
     if (tokenizedQuery.size() != 2)
     {
         cout << "SYNTAX ERROR" << endl;
