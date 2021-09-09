@@ -5,6 +5,11 @@ void TableCatalogue::insertTable(Table* table)
     logger.log("TableCatalogue::~insertTable"); 
     this->tables[table->tableName] = table;
 }
+void TableCatalogue::insertMatrix(Matrix *matrix)
+{
+    logger.log("TableCatalogue::~insertMatrix"); 
+    this->matrices[matrix->matrixName] = matrix;
+}
 void TableCatalogue::deleteTable(string tableName)
 {
     logger.log("TableCatalogue::deleteTable"); 
@@ -22,6 +27,14 @@ bool TableCatalogue::isTable(string tableName)
 {
     logger.log("TableCatalogue::isTable"); 
     if (this->tables.count(tableName))
+        return true;
+    return false;
+}
+
+bool TableCatalogue::isMatrix(string matrixName)
+{
+    logger.log("TableCatalogue::isMatrix");
+    if(this->matrices.count(matrixName))
         return true;
     return false;
 }

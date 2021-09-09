@@ -35,7 +35,11 @@ bool semanticParseLOAD()
         cout << "SEMANTIC ERROR: Relation already exists" << endl;
         return false;
     }
-
+    if(tableCatalogue.isMatrix(parsedQuery.loadRelationName))
+    {
+        cout << "SEMANTIC ERROR: Matrix already exists" << endl;
+        return false;
+    }
     if (!isFileExists(parsedQuery.loadRelationName))
     {
         cout << "SEMANTIC ERROR: Data file doesn't exist" << endl;
@@ -60,6 +64,11 @@ void executeLOAD()
 void executeLOAD_MATRIX()
 {
     logger.log("executeLOAD_MATRIX");
-    
+
+    Matrix *matrix = new Matrix(parsedQuery.loadRelationName);   
+    if(matrix->load())
+    {
+        tableCatalogue.insertMatrix(matrix);
+    }
     return;
 }
