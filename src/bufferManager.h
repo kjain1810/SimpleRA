@@ -1,3 +1,5 @@
+#ifndef bufferManager_H
+#define bufferManager_H
 #include"page.h"
 
 /**
@@ -36,3 +38,4 @@ class BufferManager{
     void deleteFile(string fileName);
     void writePage(string tableName, int pageIndex, vector<vector<int>> rows, int rowCount);
 };
+#endif

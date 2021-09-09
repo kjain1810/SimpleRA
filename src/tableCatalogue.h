@@ -1,3 +1,5 @@
+#ifndef tableCatalogue_H
+#define tableCatalogue_H
 #include "table.h"
 #include "matrix.h"
 /**
@@ -25,3 +27,4 @@ public:
     void insertMatrix(Matrix *matrix);
     ~TableCatalogue();
 };
+#endif

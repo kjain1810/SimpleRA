@@ -1,3 +1,5 @@
+#ifndef matrix_H
+#define matrix_H
 #include "cursor.h"
 
 class Matrix
@@ -11,3 +13,4 @@ public:
     bool load();
     Matrix(string);
 };
+#endif

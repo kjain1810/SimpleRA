@@ -1,3 +1,5 @@
+#ifndef global_H
+#define global_H
 #include"executor.h"
 
 extern float BLOCK_SIZE;
@@ -7,3 +9,4 @@ extern vector<string> tokenizedQuery;
 extern ParsedQuery parsedQuery;
 extern TableCatalogue tableCatalogue;
 extern BufferManager bufferManager;
+#endif
