@@ -21,7 +21,8 @@ enum QueryType
     SORT,
     SOURCE,
     UNDETERMINED,
-    LOAD_MATRIX
+    LOAD_MATRIX,
+    PRINT_MATRIX
 };
 
 enum BinaryOperator

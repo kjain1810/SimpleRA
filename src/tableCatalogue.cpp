@@ -23,6 +23,12 @@ Table* TableCatalogue::getTable(string tableName)
     Table *table = this->tables[tableName];
     return table;
 }
+Matrix* TableCatalogue::getMatrix(string matrixName)
+{
+    logger.log("TableCatalogue::getMatrix"); 
+    Matrix *matrix = this->matrices[matrixName];
+    return matrix;
+}
 bool TableCatalogue::isTable(string tableName)
 {
     logger.log("TableCatalogue::isTable"); 

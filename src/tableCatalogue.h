@@ -25,6 +25,7 @@ public:
 
     bool isMatrix(string matrixName);
     void insertMatrix(Matrix *matrix);
+    Matrix* getMatrix(string matrixName);
     ~TableCatalogue();
 };
 #endif

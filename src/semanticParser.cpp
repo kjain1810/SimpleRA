@@ -18,6 +18,7 @@ bool semanticParse(){
         case SORT: return semanticParseSORT();
         case SOURCE: return semanticParseSOURCE();
         case LOAD_MATRIX: return semanticParseLOAD();
+        case PRINT_MATRIX: return semanticParsePRINT();
         default: cout<<"SEMANTIC ERROR"<<endl;
     }
 

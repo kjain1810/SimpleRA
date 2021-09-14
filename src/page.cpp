@@ -31,14 +31,37 @@ Page::Page(string tableName, int pageIndex)
     this->tableName = tableName;
     this->pageIndex = pageIndex;
     this->pageName = "../data/temp/" + this->tableName + "_Page" + to_string(pageIndex);
-    Table table = *tableCatalogue.getTable(tableName);
-    this->columnCount = table.columnCount;
-    uint maxRowCount = table.maxRowsPerBlock;
+    
+    Table table;
+    Matrix matrix;
+    bool isMatrix = false;
+
+    if(tableCatalogue.isTable(tableName))
+        table = *tableCatalogue.getTable(tableName);
+    else
+    {
+        matrix = *tableCatalogue.getMatrix(tableName);
+        isMatrix = true;
+    }
+    uint maxRowCount;
+    if(!isMatrix)
+    {
+        this->columnCount = table.columnCount;
+        maxRowCount = table.maxRowsPerBlock;
+    }
+    else
+    {
+        this->columnCount = matrix.n;
+        maxRowCount = matrix.maxRowsPerBlock;
+    }
     vector<int> row(columnCount, 0);
     this->rows.assign(maxRowCount, row);
 
     ifstream fin(pageName, ios::in);
-    this->rowCount = table.rowsPerBlockCount[pageIndex];
+    if (!isMatrix)
+        this->rowCount = table.rowsPerBlockCount[pageIndex];
+    else
+        this->rowCount = matrix.rowsPerBlockCount[pageIndex];
     int number;
     for (uint rowCounter = 0; rowCounter < this->rowCount; rowCounter++)
     {
@@ -50,6 +73,7 @@ Page::Page(string tableName, int pageIndex)
     }
     fin.close();
 }
+
 
 /**
  * @brief Get row from page indexed by rowIndex
