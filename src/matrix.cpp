@@ -31,16 +31,19 @@ bool Matrix::load_normal()
     vector<int> row(this->n, 0);
     vector<vector<int>>rowsInPage(this->maxRowsPerBlock, row);
     int pageCounter = 0;
+    cout << "Max Rows Per Block: " << this->maxRowsPerBlock << "\n";
     while(getline(fin, line))
     {
         stringstream s(line);
         for(int col = 0; col < this->n; col++)
         {
+            cout << col << "\n";
             if(!getline(s, word, ','))
                 return false;
             rowsInPage[pageCounter][col] = stoi(word);
         }
         pageCounter++;
+        cout << pageCounter << "\n";
         if(pageCounter == this->maxRowsPerBlock)
         {
             bufferManager.writePage(this->matrixName, this->blockCount, rowsInPage, pageCounter);
@@ -156,4 +159,11 @@ void Matrix::print()
         this->writeRow(row, cout);
     }
     printRowCount(this->n);
+}
+
+void Matrix::getNextPage(Cursor *cursor)
+{
+    logger.log("Matrix::getNextPage");
+    if (cursor->pageIndex < this->blockCount - 1)
+        cursor->nextPage(cursor->pageIndex+1);
 }

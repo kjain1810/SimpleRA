@@ -23,6 +23,8 @@ public:
     Matrix(string);
     Matrix();
 
+    void getNextPage(Cursor *cursor);
+
     template <typename T>
     void writeRow(vector<T> row, ostream &fout)
     {

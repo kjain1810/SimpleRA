@@ -2,7 +2,7 @@ BufferManager::BufferManager
 ParseQuery::clear
 
 Reading New Command: 
-LOAD MATRIX MATRIX
+LOAD MATRIX larger_medium
 doCommand
 syntacticParse
 syntacticParseLOAD
@@ -15,45 +15,3 @@ Matrix::Matrix
 Matrix::load
 Matrix::check_sparse
 Matrix::load_normal
-BufferManager::writePage
-Page::Page
-Page::writePage
-TableCatalogue::~insertMatrix
-ParseQuery::clear
-
-Reading New Command: 
-PRINT MATRIX MATRIX
-doCommand
-syntacticParse
-syntacticParsePRINT
-semanticParse
-semanticParsePRINT
-TableCatalogue::isTable
-TableCatalogue::isMatrix
-executePRINT_MATRIX
-TableCatalogue::getMatrix
-Matrix::print
-Cursor::Cursor
-BufferManager::getPage
-BufferManager::inPool
-BufferManager::insertIntoPool
-Page::Page
-Table::Table
-Matrix::Matrix
-TableCatalogue::isTable
-TableCatalogue::getMatrix
-Cursor::geNext
-Page::getRow
-Table::printRow
-Cursor::geNext
-Page::getRow
-Table::printRow
-ParseQuery::clear
-
-Reading New Command: 
-EXIT
-ParseQuery::clear
-
-Reading New Command: 
-QUIT
-TableCatalogue::~TableCatalogue
