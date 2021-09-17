@@ -9,8 +9,8 @@ int main(int agrc, char* agrv[])
     for(int a = 0; a < n; a++)
     {
         for(int b = 0; b < n - 1; b++)
-            fout << a <<",";
-        fout << a << "\n";
+            fout << (int)(a == n - 1 || a == 1) <<",";
+        fout << (int)(a == n - 1 || a == 0) << "\n";
     }
     fout.close();
     return 0;

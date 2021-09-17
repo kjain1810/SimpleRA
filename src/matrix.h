@@ -8,6 +8,7 @@ public:
     string sourceFileName = "";
     string matrixName = "";
     bool sparseMatrix = false;
+    bool isZero = true;
     bool transposed = false;
     uint n = 0;
     int maxElementsPerBlock;

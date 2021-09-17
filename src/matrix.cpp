@@ -89,15 +89,18 @@ bool Matrix::load_sparse()
                 return false;
             row[1] = col;
             row[2] = stoi(word);
-            rowsInPage[idx] = row;
-        }
-        pageCounter++;
-        if(pageCounter == this->maxElementsPerBlock)
-        {
-            bufferManager.writePage(this->matrixName, this->blockCount, rowsInPage, pageCounter);
-            this->blockCount++;
-            this->elementsPerBlockCount.emplace_back(pageCounter);
-            pageCounter = 0;
+            if(row[2] != 0)
+            {
+                rowsInPage[pageCounter] = row;
+                pageCounter++;
+            }
+            if(pageCounter == this->maxElementsPerBlock)
+            {
+                bufferManager.writePage(this->matrixName, this->blockCount, rowsInPage, pageCounter);
+                this->blockCount++;
+                this->elementsPerBlockCount.emplace_back(pageCounter);
+                pageCounter = 0;
+            }
         }
         rowCounter++;
         row[0] = rowCounter;
@@ -117,7 +120,7 @@ int Matrix::check_sparse()
     logger.log("Matrix::check_sparse");
     ifstream fin(this->sourceFileName, ios::in);
     string line, word;
-    int numZero = 0;
+    long long numZero = 0;
     int numRows = 0;
     while(getline(fin, line))
     {
@@ -143,6 +146,7 @@ int Matrix::check_sparse()
                 return -1;
         }
     }
+    this->isZero = ((this->n * 1LL) * (this->n * 1LL) == numZero);
     if(numRows != this->n)
         return -1;
     if((1LL * numZero) * 5LL >= ((1LL * n) * (1LL * n)) * 3LL)
