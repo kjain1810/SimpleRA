@@ -19,7 +19,10 @@ bool Matrix::load()
     if(here == -1)
         return false;
     if(here == 1)
+    {
+        this->sparseMatrix = true;
         return this->load_sparse();
+    }
     return this->load_normal();
 }
 
@@ -193,12 +196,10 @@ void Matrix::print()
             }
             this->writeRow(finalRow, cout);
         }
-        printRowCount(this->n);
     }
     else if(!this->sparseMatrix && this->transposed)
     {
         uint count = min(PRINT_COUNT, this->n);
-        cout << "Printing transposed matrix\n";
         for(int row = 0; row < count; row++)
         {
             for(int col = 0; col < this->n; col++)
@@ -210,6 +211,69 @@ void Matrix::print()
             cout << "\n";
         }
     }
+    else if(this->sparseMatrix && !this->transposed)
+    {
+        uint count = min(PRINT_COUNT, this->n);
+        
+        Cursor cursor(this->matrixName, 0);
+        vector<pair<int, pair<int, int>>> row;
+        if(!this->isZero){
+            while(true)
+            {
+                vector<int> here = cursor.getNext();
+                if(here.size() != 3 || here[0] >= count)
+                    break;
+                row.push_back({here[0], {here[1], here[2]}});
+            }
+        }
+        int idx = 0;
+        for(int r = 0; r < count; r++)
+        {
+            for(int c = 0; c < this->n; c++)
+            {
+                if(idx < row.size() && row[idx].first == r && row[idx].second.first == c)
+                    cout << row[idx++].second.second;
+                else
+                    cout << "0";
+                if(c != this->n - 1)
+                    cout << ", ";
+            }
+            cout << endl;
+        }
+    }
+    else if(this->sparseMatrix &&& this->transposed)
+    {
+        uint count = min(PRINT_COUNT, this->n);
+
+        Cursor cursor(this->matrixName, 0);
+        vector<pair<int, pair<int, int>>> row;
+        if(!this->isZero){
+            while(true)
+            {
+                vector<int> here = cursor.getNext();
+                if(here.size() != 3)
+                    break;
+                if(here[2] < count)
+                    row.push_back({here[0], {here[1], here[2]}});
+            }
+        }
+        int idx = 0;
+        for(int r = 0; r < count; r++)
+        {
+            for(int c = 0; c < this->n; c++)
+            {
+                if(idx < row.size() && row[idx].second.first == r && row[idx].first == c)
+                    cout << row[idx++].second.second;
+                else
+                    cout << "0";
+                if(c != this->n - 1)
+                    cout << ", ";
+            }
+            cout << endl;
+        }
+
+    }
+    printRowCount(this->n);
 }
 
 int Matrix::get_element(int r, int c)
