@@ -157,45 +157,76 @@ int Matrix::check_sparse()
 void Matrix::print()
 {
     logger.log("Matrix::print");
-    uint count = min(PRINT_COUNT, this->n);
-
-    for(int rowCounter = 0; rowCounter < count; rowCounter++)
+    if(!this->sparseMatrix && !this->transposed)
     {
-        int i = rowCounter;
-        int j = 0;
-        vector<int> finalRow;
-        while(j < n){
-            int pageNumber = this->getPageNumber(i, j);
-            pair<int, int> name = this->pageName(pageNumber);
-            Cursor cursor(this->matrixName, pageNumber, name.first, name.second);
-            vector<int> row = cursor.getMatrixPage();
-            int idx = 0;
-            while(name.first != i || name.second != j)
-            {
-                idx++;
-                name.second++;
-                if(name.second == this->n)
+        uint count = min(PRINT_COUNT, this->n);
+        for(int rowCounter = 0; rowCounter < count; rowCounter++)
+        {
+            int i = rowCounter;
+            int j = 0;
+            vector<int> finalRow;
+            while(j < n){
+                int pageNumber = this->getPageNumber(i, j);
+                pair<int, int> name = this->pageName(pageNumber);
+                Cursor cursor(this->matrixName, pageNumber, name.first, name.second);
+                vector<int> row = cursor.getMatrixPage();
+                int idx = 0;
+                while(name.first != i || name.second != j)
                 {
-                    name.second = 0;
-                    name.first++;
+                    idx++;
+                    name.second++;
+                    if(name.second == this->n)
+                    {
+                        name.second = 0;
+                        name.first++;
+                    }
+                }
+                while(idx < row.size() && finalRow.size() < this->n)
+                {
+                    finalRow.push_back(row[idx++]);
+                    j++;
                 }
             }
-            while(idx < row.size() && finalRow.size() < this->n)
-            {
-                finalRow.push_back(row[idx++]);
-                j++;
-            }
+            this->writeRow(finalRow, cout);
         }
-        this->writeRow(finalRow, cout);
+        printRowCount(this->n);
     }
-    // Cursor cursor(this->matrixName, 0, 0, 0);
-    // vector<int>row;
-    // for(int rowCounter = 0; rowCounter < count; rowCounter++)
-    // {
-    //     row = cursor.getNext();
-    //     this->writeRow(row, cout);
-    // }
-    printRowCount(this->n);
+    else if(!this->sparseMatrix && this->transposed)
+    {
+        uint count = min(PRINT_COUNT, this->n);
+        cout << "Printing transposed matrix\n";
+        for(int row = 0; row < count; row++)
+        {
+            for(int col = 0; col < this->n; col++)
+            {
+                cout << this->get_element(col, row);
+                if(col < this->n - 1)
+                    cout << ", ";
+            }
+            cout << "\n";
+        }
+    }
+}
+
+int Matrix::get_element(int r, int c)
+{
+    logger.log("Matrix::get_element");
+    int pageNumber = this->getPageNumber(r, c);
+    pair<int, int> name = this->pageName(pageNumber);
+    Cursor cursor(this->matrixName, pageNumber, name.first, name.second);
+    vector<int> row = cursor.getMatrixPage();
+    int idx = 0;
+    while(name.first != r || name.second != c)
+    {
+        idx++;
+        name.second++;
+        if(name.second == this->n)
+        {
+            name.second = 0;
+            name.first++;
+        }
+    }
+    return row[idx];
 }
 
 void Matrix::getNextPage(Cursor *cursor)
@@ -219,4 +250,10 @@ pair<int, int> Matrix::pageName(int pageIndex)
 {
     long long numElements = this->maxElementsPerBlock * pageIndex;
     return {numElements / this->n, numElements % this->n};
+}
+
+void Matrix::transpose()
+{
+    logger.log("Matrix::transpose");
+    this->transposed = !this->transposed;
 }

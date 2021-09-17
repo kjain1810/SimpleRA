@@ -20,6 +20,9 @@ public:
     int check_sparse();
 
     void print();
+    void transpose();
+    int get_element(int row, int col);
+
     Matrix(string);
     Matrix();
     int getPageNumber(int i, int j);

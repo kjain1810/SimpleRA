@@ -22,7 +22,8 @@ enum QueryType
     SOURCE,
     UNDETERMINED,
     LOAD_MATRIX,
-    PRINT_MATRIX
+    PRINT_MATRIX,
+    TRANSPOSE
 };
 
 enum BinaryOperator
@@ -81,6 +82,8 @@ public:
     string loadRelationName = "";
 
     string printRelationName = "";
+    
+    string transposeMatrixName = "";
 
     string projectionResultRelationName = "";
     vector<string> projectionColumnList;
@@ -124,6 +127,7 @@ bool syntacticParseRENAME();
 bool syntacticParseSELECTION();
 bool syntacticParseSORT();
 bool syntacticParseSOURCE();
+bool syntacticParseTRANSPOSE();
 
 bool isFileExists(string tableName);
 bool isQueryFile(string fileName);
