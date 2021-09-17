@@ -20,6 +20,10 @@ class Page{
     int rowCount;
     vector<vector<int>> rows;
 
+    vector<int> elements;
+    int startRow, startCol;
+    long long elementCount;
+
     public:
 
     string pageName = "";
@@ -27,7 +31,11 @@ class Page{
     Page(string tableName, int pageIndex);
     Page(string matrixName, int pageIndex, bool isMatrix);
     Page(string tableName, int pageIndex, vector<vector<int>> rows, int rowCount);
+    Page(string matrixName, int pageIndex, vector<int> elements, int elementCount, int startRow, int startCol);
+    Page(string matrixName, int pageIndex, int row, int col);
     vector<int> getRow(int rowIndex);
+    vector<int> getElements();
     void writePage();
+    void writePageMatrix();
 };
 #endif

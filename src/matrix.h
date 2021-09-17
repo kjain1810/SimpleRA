@@ -10,9 +10,9 @@ public:
     bool sparseMatrix = false;
     bool transposed = false;
     uint n = 0;
-    int maxRowsPerBlock;
+    int maxElementsPerBlock;
     int blockCount = 0;
-    vector<uint> rowsPerBlockCount;
+    vector<uint> elementsPerBlockCount;
 
     bool load();
     bool load_sparse();
@@ -22,6 +22,9 @@ public:
     void print();
     Matrix(string);
     Matrix();
+    int getPageNumber(int i, int j);
+    int positionInPage(int i, int j);
+    pair<int, int> pageName(int pageIndex);
 
     void getNextPage(Cursor *cursor);
 

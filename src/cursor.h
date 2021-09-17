@@ -16,7 +16,10 @@ class Cursor{
 
     public:
     Cursor(string tableName, int pageIndex);
+    Cursor(string matrixName, int pageIndex, int row, int col);
     vector<int> getNext();
+    vector<int> getMatrixPage();
     void nextPage(int pageIndex);
+    void nextPage(int pageIndex, int row, int col);
 };
 #endif

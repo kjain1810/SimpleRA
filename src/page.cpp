@@ -32,36 +32,14 @@ Page::Page(string tableName, int pageIndex)
     this->pageIndex = pageIndex;
     this->pageName = "../data/temp/" + this->tableName + "_Page" + to_string(pageIndex);
     
-    Table table;
-    Matrix matrix;
-    bool isMatrix = false;
-
-    if(tableCatalogue.isTable(tableName))
-        table = *tableCatalogue.getTable(tableName);
-    else
-    {
-        matrix = *tableCatalogue.getMatrix(tableName);
-        isMatrix = true;
-    }
-    uint maxRowCount;
-    if(!isMatrix)
-    {
-        this->columnCount = table.columnCount;
-        maxRowCount = table.maxRowsPerBlock;
-    }
-    else
-    {
-        this->columnCount = matrix.n;
-        maxRowCount = matrix.maxRowsPerBlock;
-    }
+    Table table = *tableCatalogue.getTable(tableName);
+    this->columnCount = table.columnCount;
+    uint maxRowCount = table.maxRowsPerBlock;
     vector<int> row(columnCount, 0);
     this->rows.assign(maxRowCount, row);
 
     ifstream fin(pageName, ios::in);
-    if (!isMatrix)
-        this->rowCount = table.rowsPerBlockCount[pageIndex];
-    else
-        this->rowCount = matrix.rowsPerBlockCount[pageIndex];
+    this->rowCount = table.rowsPerBlockCount[pageIndex];
     int number;
     for (uint rowCounter = 0; rowCounter < this->rowCount; rowCounter++)
     {
@@ -72,6 +50,35 @@ Page::Page(string tableName, int pageIndex)
         }
     }
     fin.close();
+}
+
+Page::Page(string matrixName, int pageIndex, int row, int col)
+{
+    logger.log("Page::Page 4 params");
+    this->tableName = matrixName;
+    this->pageIndex = pageIndex;
+    this->pageName = "../data/temp/"+this->tableName+"_Page"+to_string(pageIndex) + "_" + to_string(row) + "_" + to_string(col);
+
+    Matrix matrix = *tableCatalogue.getMatrix(matrixName);
+    this->elementCount = matrix.elementsPerBlockCount[pageIndex];
+    this->elements.assign(this->elementCount, 0);
+
+    ifstream fin(pageName, ios::in);
+    for(int elementCounter = 0; elementCounter < elementCount; elementCounter++)
+        fin >> this->elements[elementCounter];
+    fin.close();
+}
+
+Page::Page(string matrixName, int pageIndex, vector<int> elements, int elementCount, int startRow, int startCol)
+{
+    logger.log("Page::Page");
+    this->tableName = matrixName;
+    this->pageIndex = pageIndex;
+    this->elements = elements;
+    this->startCol = startCol;
+    this->startRow = startRow;
+    this->elementCount = this->elements.size();
+    this->pageName = "../data/temp/"+this->tableName+"_Page"+to_string(pageIndex) + "_" + to_string(startRow) + "_" + to_string(startCol);
 }
 
 
@@ -89,6 +96,12 @@ vector<int> Page::getRow(int rowIndex)
     if (rowIndex >= this->rowCount)
         return result;
     return this->rows[rowIndex];
+}
+
+vector<int> Page::getElements()
+{
+    logger.log("Page::getElements");
+    return this->elements;
 }
 
 Page::Page(string tableName, int pageIndex, vector<vector<int>> rows, int rowCount)
@@ -119,6 +132,19 @@ void Page::writePage()
             fout << this->rows[rowCounter][columnCounter];
         }
         fout << endl;
+    }
+    fout.close();
+}
+
+void Page::writePageMatrix()
+{
+    logger.log("Page::writePageMatrix");
+    ofstream fout(this->pageName, ios::trunc);
+    for(int elementCounter = 0; elementCounter < this->elementCount; elementCounter++)
+    {
+        if(elementCounter != 0)
+            fout << " ";
+        fout << this->elements[elementCounter];
     }
     fout.close();
 }
