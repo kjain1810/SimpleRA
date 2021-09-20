@@ -297,6 +297,29 @@ int Matrix::get_element(int r, int c)
     return row[idx];
 }
 
+vector<int> Matrix::get_row_sparse(int r)
+{
+    logger.log("Matrix::get_element_sparse");
+    Cursor cursor(this->matrixName, 0);
+    vector<int> vec;
+    vector<pair<int, int>> ret;
+    int x = 0, y = 1;
+    if(this->transposed)
+        swap(x, y);
+    while(true)
+    {
+        vec = cursor.getNext();
+        if(vec.size() == 0)
+            break;
+        if(vec[x] == r)
+            ret.push_back({vec[y], vec[2]});
+    }
+    vector<int> result(this->n, 0);
+    for(int a = 0; a < ret.size(); a++)
+        result[ret[a].first] = ret[a].second;
+    return result;
+}
+
 void Matrix::getNextPage(Cursor *cursor)
 {
     logger.log("Matrix::getNextPage");
@@ -384,62 +407,101 @@ void Matrix::exportMatrix()
     else if(this->sparseMatrix && !this->transposed)
     {
         uint count = this->n;
-        Cursor cursor(this->matrixName, 0);
-        vector<pair<int, pair<int, int>>> row;
-        if(!this->isZero){
-            while(true)
-            {
-                vector<int> here = cursor.getNext();
-                if(here.size() != 3 || here[0] >= count)
-                    break;
-                row.push_back({here[0], {here[1], here[2]}});
-            }
-        }
-        int idx = 0;
+        // Cursor cursor(this->matrixName, 0);
+        // vector<pair<int, pair<int, int>>> row;
+        // if(!this->isZero){
+        //     while(true)
+        //     {
+        //         vector<int> here = cursor.getNext();
+        //         if(here.size() != 3 || here[0] >= count)
+        //             break;
+        //         row.push_back({here[0], {here[1], here[2]}});
+        //     }
+        // }
+        // int idx = 0;
+        // vector<pair<int, pair<int, int>>> smRow;
+        // for(int r = 0; r < count; r++)
+        // {
+        //     vector<int> here;
+        //     while(true)
+        //     {
+        //         here = cursor.getNext();
+        //         if(here.size() != 3)
+        //             break;
+        //         if(here[0] > r)
+        //             break;
+        //         smRow.push_back({here[0], {here[1], here[2]}});
+        //     }
+        //     int idx = 0;
+        //     for(int c = 0; c < this->n; c++)
+        //     {
+        //         if(idx < smRow.size() && smRow[idx].first == r && smRow[idx].second.first == c)
+        //             fout << smRow[idx++].second.second;
+        //         else
+        //             fout << "0";
+        //         if(c != this->n - 1)
+        //             fout << ",";
+        //     }
+        //     fout << endl;
+        //     smRow.clear();
+        //     if(here.size() == 3)
+        //         smRow.push_back({here[0], {here[1], here[2]}});
+        // }
         for(int r = 0; r < count; r++)
         {
+            vector<int> here = this->get_row_sparse(r);
             for(int c = 0; c < this->n; c++)
             {
-                if(idx < row.size() && row[idx].first == r && row[idx].second.first == c)
-                    fout << row[idx++].second.second;
-                else
-                    fout << "0";
-                if(c != this->n - 1)
+                fout << here[c];
+                if(c != this->n)
                     fout << ",";
             }
-            fout << endl;
+            fout << "\n";
         }
     }
     else if(this->sparseMatrix &&& this->transposed)
     {
         uint count = this->n;
 
-        Cursor cursor(this->matrixName, 0);
-        vector<pair<int, pair<int, int>>> row;
-        if(!this->isZero){
-            while(true)
-            {
-                vector<int> here = cursor.getNext();
-                if(here.size() != 3)
-                    break;
-                if(here[2] < count)
-                    row.push_back({here[0], {here[1], here[2]}});
-            }
-        }
-        int idx = 0;
+        // Cursor cursor(this->matrixName, 0);
+        // vector<pair<int, pair<int, int>>> row;
+        // if(!this->isZero){
+        //     while(true)
+        //     {
+        //         vector<int> here = cursor.getNext();
+        //         if(here.size() != 3)
+        //             break;
+        //         if(here[2] < count)
+        //             row.push_back({here[0], {here[1], here[2]}});
+        //     }
+        // }
+        // int idx = 0;
+        // for(int r = 0; r < count; r++)
+        // {
+        //     for(int c = 0; c < this->n; c++)
+        //     {
+        //         if(idx < row.size() && row[idx].second.first == r && row[idx].first == c)
+        //             fout << row[idx++].second.second;
+        //         else
+        //             fout << "0";
+        //         if(c != this->n - 1)
+        //             fout << ",";
+        //     }
+        //     fout << endl;
+        // }
+
         for(int r = 0; r < count; r++)
         {
+            vector<int> here = this->get_row_sparse(r);
             for(int c = 0; c < this->n; c++)
             {
-                if(idx < row.size() && row[idx].second.first == r && row[idx].first == c)
-                    fout << row[idx++].second.second;
-                else
-                    fout << "0";
-                if(c != this->n - 1)
+                fout << here[c];
+                if(c != this->n)
                     fout << ",";
             }
-            fout << endl;
+            fout << "\n";
         }
+
 
     }
 
