@@ -30,9 +30,9 @@ bool syntacticParsePRINT()
 bool semanticParsePRINT()
 {
     logger.log("semanticParsePRINT");
-    if(tableCatalogue.isTable(parsedQuery.printRelationName))
+    if(parsedQuery.queryType == PRINT &&  tableCatalogue.isTable(parsedQuery.printRelationName))
         return true;
-    if(tableCatalogue.isMatrix(parsedQuery.printRelationName))
+    if(parsedQuery.queryType == PRINT_MATRIX && tableCatalogue.isMatrix(parsedQuery.printRelationName))
         return true;
     cout << "SEMANTIC ERROR: Relation or matrix doesn't exist" << endl;
     return false;

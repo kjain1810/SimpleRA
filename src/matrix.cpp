@@ -325,3 +325,130 @@ void Matrix::transpose()
     logger.log("Matrix::transpose");
     this->transposed = !this->transposed;
 }
+
+void Matrix::exportMatrix()
+{
+    logger.log("Matrix::exportMatrix");
+    if(!this->isPermanent())
+        bufferManager.deleteFile(this->sourceFileName);
+    string newSourceFile = "../data/" + this->matrixName + ".csv";
+    ofstream fout(newSourceFile, ios::out);
+
+    if(!this->sparseMatrix && !this->transposed)
+    {
+        uint count = this->n;
+        for(int rowCounter = 0; rowCounter < count; rowCounter++)
+        {
+            int i = rowCounter;
+            int j = 0;
+            vector<int> finalRow;
+            while(j < n){
+                int pageNumber = this->getPageNumber(i, j);
+                pair<int, int> name = this->pageName(pageNumber);
+                Cursor cursor(this->matrixName, pageNumber, name.first, name.second);
+                vector<int> row = cursor.getMatrixPage();
+                int idx = 0;
+                while(name.first != i || name.second != j)
+                {
+                    idx++;
+                    name.second++;
+                    if(name.second == this->n)
+                    {
+                        name.second = 0;
+                        name.first++;
+                    }
+                }
+                while(idx < row.size() && finalRow.size() < this->n)
+                {
+                    finalRow.push_back(row[idx++]);
+                    j++;
+                }
+            }
+            this->writeRow(finalRow, fout);
+        }
+    }
+    else if(!this->sparseMatrix && this->transposed)
+    {
+        uint count = this->n;
+        for(int row = 0; row < count; row++)
+        {
+            for(int col = 0; col < this->n; col++)
+            {
+                fout << this->get_element(col, row);
+                if(col < this->n - 1)
+                    fout << ",";
+            }
+            fout << "\n";
+        }
+    }
+    else if(this->sparseMatrix && !this->transposed)
+    {
+        uint count = this->n;
+        Cursor cursor(this->matrixName, 0);
+        vector<pair<int, pair<int, int>>> row;
+        if(!this->isZero){
+            while(true)
+            {
+                vector<int> here = cursor.getNext();
+                if(here.size() != 3 || here[0] >= count)
+                    break;
+                row.push_back({here[0], {here[1], here[2]}});
+            }
+        }
+        int idx = 0;
+        for(int r = 0; r < count; r++)
+        {
+            for(int c = 0; c < this->n; c++)
+            {
+                if(idx < row.size() && row[idx].first == r && row[idx].second.first == c)
+                    fout << row[idx++].second.second;
+                else
+                    fout << "0";
+                if(c != this->n - 1)
+                    fout << ",";
+            }
+            fout << endl;
+        }
+    }
+    else if(this->sparseMatrix &&& this->transposed)
+    {
+        uint count = this->n;
+
+        Cursor cursor(this->matrixName, 0);
+        vector<pair<int, pair<int, int>>> row;
+        if(!this->isZero){
+            while(true)
+            {
+                vector<int> here = cursor.getNext();
+                if(here.size() != 3)
+                    break;
+                if(here[2] < count)
+                    row.push_back({here[0], {here[1], here[2]}});
+            }
+        }
+        int idx = 0;
+        for(int r = 0; r < count; r++)
+        {
+            for(int c = 0; c < this->n; c++)
+            {
+                if(idx < row.size() && row[idx].second.first == r && row[idx].first == c)
+                    fout << row[idx++].second.second;
+                else
+                    fout << "0";
+                if(c != this->n - 1)
+                    fout << ",";
+            }
+            fout << endl;
+        }
+
+    }
+
+}
+
+bool Matrix::isPermanent()
+{
+    logger.log("Table::isPermanent");
+    if (this->sourceFileName == "../data/" + this->matrixName + ".csv")
+        return true;
+    return false;
+}

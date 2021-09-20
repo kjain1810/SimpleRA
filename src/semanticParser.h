@@ -19,4 +19,5 @@ bool semanticParseSELECTION();
 bool semanticParseSORT();
 bool semanticParseSOURCE();
 bool semanticParseTRANSPOSE();
+bool semanticParseEXPORT_MATRIX();
 #endif

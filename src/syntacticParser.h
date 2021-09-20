@@ -23,7 +23,8 @@ enum QueryType
     UNDETERMINED,
     LOAD_MATRIX,
     PRINT_MATRIX,
-    TRANSPOSE
+    TRANSPOSE,
+    EXPORT_MATRIX
 };
 
 enum BinaryOperator

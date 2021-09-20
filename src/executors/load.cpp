@@ -30,12 +30,12 @@ bool syntacticParseLOAD()
 bool semanticParseLOAD()
 {
     logger.log("semanticParseLOAD");
-    if (tableCatalogue.isTable(parsedQuery.loadRelationName))
+    if (parsedQuery.queryType == LOAD && tableCatalogue.isTable(parsedQuery.loadRelationName))
     {
         cout << "SEMANTIC ERROR: Relation already exists" << endl;
         return false;
     }
-    if(tableCatalogue.isMatrix(parsedQuery.loadRelationName))
+    if(parsedQuery.queryType == LOAD_MATRIX && tableCatalogue.isMatrix(parsedQuery.loadRelationName))
     {
         cout << "SEMANTIC ERROR: Matrix already exists" << endl;
         return false;

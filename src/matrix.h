@@ -22,6 +22,8 @@ public:
 
     void print();
     void transpose();
+    void exportMatrix();
+    bool isPermanent();
     int get_element(int row, int col);
 
     Matrix(string);
