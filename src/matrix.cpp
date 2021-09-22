@@ -171,7 +171,7 @@ void Matrix::print()
         {
             int i = rowCounter;
             int j = 0;
-            vector<int> finalRow;
+            // vector<int> finalRow;
             while(j < n){
                 int pageNumber = this->getPageNumber(i, j);
                 pair<int, int> name = this->pageName(pageNumber);
@@ -188,13 +188,16 @@ void Matrix::print()
                         name.first++;
                     }
                 }
-                while(idx < row.size() && finalRow.size() < this->n)
+                while(idx < row.size() && j < this->n)
                 {
-                    finalRow.push_back(row[idx++]);
+                    cout << row[idx++];
+                    if(j == n - 1)
+                        cout << "\n";
+                    else
+                        cout << ", ";
                     j++;
                 }
             }
-            this->writeRow(finalRow, cout);
         }
     }
     else if(!this->sparseMatrix && this->transposed)
@@ -215,61 +218,32 @@ void Matrix::print()
     {
         uint count = min(PRINT_COUNT, this->n);
         
-        Cursor cursor(this->matrixName, 0);
-        vector<pair<int, pair<int, int>>> row;
-        if(!this->isZero){
-            while(true)
-            {
-                vector<int> here = cursor.getNext();
-                if(here.size() != 3 || here[0] >= count)
-                    break;
-                row.push_back({here[0], {here[1], here[2]}});
-            }
-        }
-        int idx = 0;
         for(int r = 0; r < count; r++)
         {
             for(int c = 0; c < this->n; c++)
             {
-                if(idx < row.size() && row[idx].first == r && row[idx].second.first == c)
-                    cout << row[idx++].second.second;
-                else
-                    cout << "0";
-                if(c != this->n - 1)
-                    cout << ", ";
+                int here = this->get_row_sparse(r, c);
+                cout << here;
+                if(c != this->n)
+                    cout << ",";
             }
-            cout << endl;
+            cout << "\n";
         }
     }
     else if(this->sparseMatrix &&& this->transposed)
     {
         uint count = min(PRINT_COUNT, this->n);
-
-        Cursor cursor(this->matrixName, 0);
-        vector<pair<int, pair<int, int>>> row;
-        if(!this->isZero){
-            while(true)
-            {
-                vector<int> here = cursor.getNext();
-                if(here.size() != 3)
-                    break;
-                if(here[2] < count)
-                    row.push_back({here[0], {here[1], here[2]}});
-            }
-        }
-        int idx = 0;
+        
         for(int r = 0; r < count; r++)
         {
             for(int c = 0; c < this->n; c++)
             {
-                if(idx < row.size() && row[idx].second.first == r && row[idx].first == c)
-                    cout << row[idx++].second.second;
-                else
-                    cout << "0";
-                if(c != this->n - 1)
-                    cout << ", ";
+                int here = this->get_row_sparse(c, r);
+                cout << here;
+                if(c != this->n)
+                    cout << ",";
             }
-            cout << endl;
+            cout << "\n";
         }
 
     }
@@ -297,12 +271,11 @@ int Matrix::get_element(int r, int c)
     return row[idx];
 }
 
-vector<int> Matrix::get_row_sparse(int r)
+int Matrix::get_row_sparse(int r, int c)
 {
     logger.log("Matrix::get_element_sparse");
     Cursor cursor(this->matrixName, 0);
     vector<int> vec;
-    vector<pair<int, int>> ret;
     int x = 0, y = 1;
     if(this->transposed)
         swap(x, y);
@@ -311,13 +284,10 @@ vector<int> Matrix::get_row_sparse(int r)
         vec = cursor.getNext();
         if(vec.size() == 0)
             break;
-        if(vec[x] == r)
-            ret.push_back({vec[y], vec[2]});
+        if(vec[x] == r && vec[y] == c)
+            return vec[2];
     }
-    vector<int> result(this->n, 0);
-    for(int a = 0; a < ret.size(); a++)
-        result[ret[a].first] = ret[a].second;
-    return result;
+    return 0;
 }
 
 void Matrix::getNextPage(Cursor *cursor)
@@ -329,16 +299,19 @@ void Matrix::getNextPage(Cursor *cursor)
 
 int Matrix::getPageNumber(int i, int j)
 {
+    logger.log("Matrix::getPageNumber");
     return (i * this->n + j) / this->maxElementsPerBlock;
 }
 
 int Matrix::positionInPage(int i, int j)
 {
+    logger.log("Matrix::positionInPage");
     return (i * this->n + j) % this->maxElementsPerBlock;
 }
 
 pair<int, int> Matrix::pageName(int pageIndex)
 {
+    logger.log("Matrix::pageName");
     long long numElements = this->maxElementsPerBlock * pageIndex;
     return {numElements / this->n, numElements % this->n};
 }
@@ -364,7 +337,6 @@ void Matrix::exportMatrix()
         {
             int i = rowCounter;
             int j = 0;
-            vector<int> finalRow;
             while(j < n){
                 int pageNumber = this->getPageNumber(i, j);
                 pair<int, int> name = this->pageName(pageNumber);
@@ -381,13 +353,16 @@ void Matrix::exportMatrix()
                         name.first++;
                     }
                 }
-                while(idx < row.size() && finalRow.size() < this->n)
+                while(idx < row.size() && j < this->n)
                 {
-                    finalRow.push_back(row[idx++]);
+                    fout << row[idx++];
+                    if(j == n - 1)
+                        fout << "\n";
+                    else
+                        fout << ",";
                     j++;
                 }
             }
-            this->writeRow(finalRow, fout);
         }
     }
     else if(!this->sparseMatrix && this->transposed)
@@ -407,52 +382,12 @@ void Matrix::exportMatrix()
     else if(this->sparseMatrix && !this->transposed)
     {
         uint count = this->n;
-        // Cursor cursor(this->matrixName, 0);
-        // vector<pair<int, pair<int, int>>> row;
-        // if(!this->isZero){
-        //     while(true)
-        //     {
-        //         vector<int> here = cursor.getNext();
-        //         if(here.size() != 3 || here[0] >= count)
-        //             break;
-        //         row.push_back({here[0], {here[1], here[2]}});
-        //     }
-        // }
-        // int idx = 0;
-        // vector<pair<int, pair<int, int>>> smRow;
-        // for(int r = 0; r < count; r++)
-        // {
-        //     vector<int> here;
-        //     while(true)
-        //     {
-        //         here = cursor.getNext();
-        //         if(here.size() != 3)
-        //             break;
-        //         if(here[0] > r)
-        //             break;
-        //         smRow.push_back({here[0], {here[1], here[2]}});
-        //     }
-        //     int idx = 0;
-        //     for(int c = 0; c < this->n; c++)
-        //     {
-        //         if(idx < smRow.size() && smRow[idx].first == r && smRow[idx].second.first == c)
-        //             fout << smRow[idx++].second.second;
-        //         else
-        //             fout << "0";
-        //         if(c != this->n - 1)
-        //             fout << ",";
-        //     }
-        //     fout << endl;
-        //     smRow.clear();
-        //     if(here.size() == 3)
-        //         smRow.push_back({here[0], {here[1], here[2]}});
-        // }
         for(int r = 0; r < count; r++)
         {
-            vector<int> here = this->get_row_sparse(r);
             for(int c = 0; c < this->n; c++)
             {
-                fout << here[c];
+                int here = this->get_row_sparse(r, c);
+                fout << here;
                 if(c != this->n)
                     fout << ",";
             }
@@ -462,40 +397,12 @@ void Matrix::exportMatrix()
     else if(this->sparseMatrix &&& this->transposed)
     {
         uint count = this->n;
-
-        // Cursor cursor(this->matrixName, 0);
-        // vector<pair<int, pair<int, int>>> row;
-        // if(!this->isZero){
-        //     while(true)
-        //     {
-        //         vector<int> here = cursor.getNext();
-        //         if(here.size() != 3)
-        //             break;
-        //         if(here[2] < count)
-        //             row.push_back({here[0], {here[1], here[2]}});
-        //     }
-        // }
-        // int idx = 0;
-        // for(int r = 0; r < count; r++)
-        // {
-        //     for(int c = 0; c < this->n; c++)
-        //     {
-        //         if(idx < row.size() && row[idx].second.first == r && row[idx].first == c)
-        //             fout << row[idx++].second.second;
-        //         else
-        //             fout << "0";
-        //         if(c != this->n - 1)
-        //             fout << ",";
-        //     }
-        //     fout << endl;
-        // }
-
         for(int r = 0; r < count; r++)
         {
-            vector<int> here = this->get_row_sparse(r);
             for(int c = 0; c < this->n; c++)
             {
-                fout << here[c];
+                int here = this->get_row_sparse(c, r);
+                fout << here;
                 if(c != this->n)
                     fout << ",";
             }
@@ -509,7 +416,7 @@ void Matrix::exportMatrix()
 
 bool Matrix::isPermanent()
 {
-    logger.log("Table::isPermanent");
+    logger.log("Matrix::isPermanent");
     if (this->sourceFileName == "../data/" + this->matrixName + ".csv")
         return true;
     return false;

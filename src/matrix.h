@@ -25,7 +25,7 @@ public:
     void exportMatrix();
     bool isPermanent();
     int get_element(int row, int col);
-    vector<int> get_row_sparse(int row);
+    int get_row_sparse(int row, int col);
 
     Matrix(string);
     Matrix();
