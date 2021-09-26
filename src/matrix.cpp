@@ -78,7 +78,7 @@ bool Matrix::load_sparse()
     logger.log("Matrix::load_sparse");
     ifstream fin(this->sourceFileName, ios::in);
     string line, word;
-    vector<int> row(3, 0);
+    vector<int> row(2, 0);
     vector<vector<int>>rowsInPage(this->maxElementsPerBlock, row);
     int pageCounter = 0;
     int rowCounter = 0;
@@ -90,9 +90,9 @@ bool Matrix::load_sparse()
         {
             if(!getline(s, word, ','))
                 return false;
-            row[1] = col;
-            row[2] = stoi(word);
-            if(row[2] != 0)
+            row[0] = rowCounter * this->n + col;
+            row[1] = stoi(word);
+            if(row[1] != 0)
             {
                 rowsInPage[pageCounter] = row;
                 pageCounter++;
@@ -276,16 +276,14 @@ int Matrix::get_row_sparse(int r, int c)
     logger.log("Matrix::get_element_sparse");
     Cursor cursor(this->matrixName, 0);
     vector<int> vec;
-    int x = 0, y = 1;
-    if(this->transposed)
-        swap(x, y);
     while(true)
     {
         vec = cursor.getNext();
         if(vec.size() == 0)
             break;
-        if(vec[x] == r && vec[y] == c)
-            return vec[2];
+        // cout << vec.size() << " " << vec[0] << " " << vec[1] << "\n";
+        if(vec[0] == this->n * r + c)
+            return vec[1];
     }
     return 0;
 }
@@ -408,8 +406,6 @@ void Matrix::exportMatrix()
             }
             fout << "\n";
         }
-
-
     }
 
 }

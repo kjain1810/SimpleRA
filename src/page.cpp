@@ -51,7 +51,7 @@ Page::Page(string tableName, int pageIndex)
     }
     else
     {
-        this->columnCount = 3;
+        this->columnCount = 2;
         maxRowCount = matrix.maxElementsPerBlock;
     }
     vector<int> row(columnCount, 0);
