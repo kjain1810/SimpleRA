@@ -6,10 +6,10 @@ Since the size of a single can be large, it can across several pages as well.
 The next row starts right after where the current row ends to save space.
 
 ## Compression technique
-For sparse matrices, we store the non-zero elements in the for of $(r, c, val)$ in rows, where $r$ is the row, $c$ is the column and $val$ is the value stored at $(r, c)$
+For sparse matrices, we store the non-zero elements in the for of $(r * n + c, val)$ in rows, where $r$ is the row, $c$ is the column and $val$ is the value stored at $(r, c)$
 
 ## Compression ratio
-For matrices with $x$ fraction of cells filled, we use $3xn^2$ space. Compared to the normal page layout, where the storage space is $n^2$, our compression ratio is $3x$ 
+For matrices with $x$ fraction of cells filled, we use $2xn^2$ space. Compared to the normal page layout, where the storage space is $n^2$, our compression ratio is $2x$ 
 Therefore, when the number of cells filled is less than a third, we save space by store the numbres in this manner.
 
 ## Transpose 
