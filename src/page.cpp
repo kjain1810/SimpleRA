@@ -85,9 +85,9 @@ Page::Page(string matrixName, int pageIndex, int row, int col)
     this->elementCount = matrix.elementsPerBlockCount[pageIndex];
     this->elements.assign(this->elementCount, 0);
 
-    ifstream fin(pageName, ios::in);
+    ifstream fin(pageName, ios::in | ios::binary);
     for(int elementCounter = 0; elementCounter < elementCount; elementCounter++)
-        fin >> this->elements[elementCounter];
+        fin.read((char *)&this->elements[elementCounter], sizeof(int));
     fin.close();
 }
 
@@ -161,12 +161,13 @@ void Page::writePage()
 void Page::writePageMatrix()
 {
     logger.log("Page::writePageMatrix");
-    ofstream fout(this->pageName, ios::trunc);
+    ofstream fout(this->pageName, ios::trunc|ios::binary);
     for(int elementCounter = 0; elementCounter < this->elementCount; elementCounter++)
     {
-        if(elementCounter != 0)
-            fout << " ";
-        fout << this->elements[elementCounter];
+        fout.write((char*)&this->elements[elementCounter], sizeof(int));
+        // if(elementCounter != 0)
+        //     fout << " ";
+        // fout << this->elements[elementCounter];
     }
     fout.close();
 }
