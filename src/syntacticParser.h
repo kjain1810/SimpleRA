@@ -69,10 +69,12 @@ public:
 
     BinaryOperator joinBinaryOperator = NO_BINOP_CLAUSE;
     string joinResultRelationName = "";
+    string joinAlgorithm = "";
     string joinFirstRelationName = "";
     string joinSecondRelationName = "";
     string joinFirstColumnName = "";
     string joinSecondColumnName = "";
+    string joinBufferSize = "";
 
     string loadRelationName = "";
 

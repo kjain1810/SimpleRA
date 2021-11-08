@@ -1,4 +1,5 @@
 #include "global.h"
+#include <string>
 /**
  * @brief 
  * SYNTAX: R <- JOIN relation_name1, relation_name2 ON column_name1 bin_op column_name2
@@ -6,19 +7,22 @@
 bool syntacticParseJOIN()
 {
     logger.log("syntacticParseJOIN");
-    if (tokenizedQuery.size() != 9 || tokenizedQuery[5] != "ON")
+    if (tokenizedQuery.size() != 13 || tokenizedQuery[7] != "ON" || tokenizedQuery[11] != "BUFFER")
     {
         cout << "SYNTAC ERROR" << endl;
+        cout << "Size: " << tokenizedQuery.size() << "\n";
         return false;
     }
     parsedQuery.queryType = JOIN;
     parsedQuery.joinResultRelationName = tokenizedQuery[0];
-    parsedQuery.joinFirstRelationName = tokenizedQuery[3];
-    parsedQuery.joinSecondRelationName = tokenizedQuery[4];
-    parsedQuery.joinFirstColumnName = tokenizedQuery[6];
-    parsedQuery.joinSecondColumnName = tokenizedQuery[8];
+    parsedQuery.joinAlgorithm = tokenizedQuery[4];
+    parsedQuery.joinFirstRelationName = tokenizedQuery[5];
+    parsedQuery.joinSecondRelationName = tokenizedQuery[6];
+    parsedQuery.joinFirstColumnName = tokenizedQuery[8];
+    parsedQuery.joinSecondColumnName = tokenizedQuery[10];
+    parsedQuery.joinBufferSize = tokenizedQuery[12];
 
-    string binaryOperator = tokenizedQuery[7];
+    string binaryOperator = tokenizedQuery[9];
     if (binaryOperator == "<")
         parsedQuery.joinBinaryOperator = LESS_THAN;
     else if (binaryOperator == ">")
@@ -36,6 +40,14 @@ bool syntacticParseJOIN()
         cout << "SYNTAX ERROR" << endl;
         return false;
     }
+    cout << "Result relation: " << parsedQuery.joinResultRelationName << "\n";
+    cout << "Join algorithm: " << parsedQuery.joinAlgorithm << "\n";
+    cout << "First relation: " << parsedQuery.joinFirstRelationName << "\n";
+    cout << "Second relation: " << parsedQuery.joinSecondRelationName << "\n";
+    cout << "First column: " << parsedQuery.joinFirstColumnName << "\n";
+    cout << "Operator: " << binaryOperator << "\n";
+    cout << "Second column: " << parsedQuery.joinSecondColumnName << "\n";
+    cout << "Buffer size: " << parsedQuery.joinBufferSize << "\n";
     return true;
 }
 
@@ -58,6 +70,12 @@ bool semanticParseJOIN()
     if (!tableCatalogue.isColumnFromTable(parsedQuery.joinFirstColumnName, parsedQuery.joinFirstRelationName) || !tableCatalogue.isColumnFromTable(parsedQuery.joinSecondColumnName, parsedQuery.joinSecondRelationName))
     {
         cout << "SEMANTIC ERROR: Column doesn't exist in relation" << endl;
+        return false;
+    }
+
+    if(atoi(parsedQuery.joinBufferSize.c_str()) < 3)
+    {
+        cout << "SEMANTIC ERROR: Buffer size should be atleast 3\n";
         return false;
     }
     return true;
