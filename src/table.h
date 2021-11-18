@@ -52,6 +52,8 @@ public:
     Cursor getCursor();
     int getColumnIndex(string columnName);
     void unload();
+    void addRow(vector<int> newRow, vector<vector<int>> &rows);
+    void addPage(vector<vector<int>> &rows);
 
     /**
  * @brief Static function that takes a vector of valued and prints them out in a

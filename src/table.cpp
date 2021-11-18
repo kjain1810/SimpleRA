@@ -335,3 +335,22 @@ int Table::getColumnIndex(string columnName)
             return columnCounter;
     }
 }
+
+void Table::addPage(vector<vector<int>> &rows)
+{
+    logger.log("Table::addPage");
+    bufferManager.writePage(this->tableName, this->blockCount, rows, rows.size());
+    logger.log("Here");
+    this->blockCount++;
+    this->rowsPerBlockCount.push_back(rows.size());
+    this->rowCount += rows.size();
+    rows.clear();
+}
+
+void Table::addRow(vector<int> newRow, vector<vector<int>> &rows)
+{
+    logger.log("Table::addRow");
+    rows.push_back(newRow);
+    if(rows.size() == this->maxRowsPerBlock)
+        this->addPage(rows);
+}
