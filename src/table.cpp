@@ -339,12 +339,16 @@ int Table::getColumnIndex(string columnName)
 void Table::addPage(vector<vector<int>> &rows)
 {
     logger.log("Table::addPage");
-    bufferManager.writePage(this->tableName, this->blockCount, rows, rows.size());
-    logger.log("Here");
-    this->blockCount++;
-    this->rowsPerBlockCount.push_back(rows.size());
-    this->rowCount += rows.size();
+    for(auto row: rows)
+        this->writeRow(row);
     rows.clear();
+    this->blockify();
+    // bufferManager.writePage(this->tableName, this->blockCount, rows, rows.size());
+    // logger.log("Here");
+    // this->blockCount++;
+    // this->rowsPerBlockCount.push_back(rows.size());
+    // this->rowCount += rows.size();
+    // rows.clear();
 }
 
 void Table::addRow(vector<int> newRow, vector<vector<int>> &rows)
@@ -353,4 +357,26 @@ void Table::addRow(vector<int> newRow, vector<vector<int>> &rows)
     rows.push_back(newRow);
     if(rows.size() == this->maxRowsPerBlock)
         this->addPage(rows);
+}
+
+void Table::writePartitions(vector<vector<int>> rows, int partNumber, int idx)
+{
+    string fileName = "../data/temp/" + this->sourceFileName + "_partition" + to_string(partNumber) + "_Page" + to_string(idx);
+    ofstream fout(fileName, ios::trunc);
+    for(auto row: rows)
+    {
+        for(int a = 0; a < row.size(); a++)
+        {
+            fout << row[a];
+            if(a < row.size() - 1)
+                fout << " ";
+        }
+        fout << "\n";
+    }
+    fout.close();
+}
+
+unordered_set<int> Table::getDistinctValuesOfColumn(int column)
+{
+    return this->distinctValuesInColumns[column];
 }
