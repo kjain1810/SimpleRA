@@ -26,6 +26,7 @@ public:
     string sourceFileName = "";
     string tableName = "";
     vector<string> columns;
+    vector<uint> distinctValuesPerColumnCount;
     uint columnCount = 0;
     long long int rowCount = 0;
     uint blockCount = 0;
@@ -34,7 +35,6 @@ public:
     bool indexed = false;
     string indexedColumn = "";
     IndexingStrategy indexingStrategy = NOTHING;
-    vector<uint> distinctValuesPerColumnCount;
     
     bool extractColumnNames(string firstLine);
     bool blockify();
@@ -54,8 +54,7 @@ public:
     void unload();
     void addRow(vector<int> newRow, vector<vector<int>> &rows);
     void addPage(vector<vector<int>> &rows);
-    void writePartitions(vector<vector<int>> rows, int partNumber, int idx);
-    unordered_set<int> getDistinctValuesOfColumn(int column);
+
     /**
  * @brief Static function that takes a vector of valued and prints them out in a
  * comma seperated format.
