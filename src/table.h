@@ -54,6 +54,8 @@ public:
     void unload();
     void addRow(vector<int> newRow, vector<vector<int>> &rows);
     void addPage(vector<vector<int>> &rows);
+    unordered_set<int> getDistinctValuesOfColumn(int column);
+    void writePartitions(vector<vector<int>> rows, int partNumber, int idx);
 
     /**
  * @brief Static function that takes a vector of valued and prints them out in a

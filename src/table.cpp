@@ -354,3 +354,27 @@ void Table::addRow(vector<int> newRow, vector<vector<int>> &rows)
     if(rows.size() == this->maxRowsPerBlock)
         this->addPage(rows);
 }
+
+unordered_set<int> Table::getDistinctValuesOfColumn(int column)
+{
+    logger.log("Table::getDitinctValueOfColumn");
+    return this->distinctValuesInColumns[column];
+}
+
+
+void Table::writePartitions(vector<vector<int>> rows, int partNumber, int idx)
+{
+    logger.log("Table::writePartitions");
+    ofstream fout("../data/temp/" + this->tableName + "_part" + to_string(partNumber) + "_Page" + to_string(idx), ios::trunc);
+    for(int a = 0; a < rows.size(); a++)
+    {
+        for(int b = 0; b < rows[a].size(); b++)
+        {
+            if (b)
+                fout << " ";
+            fout << rows[a][b];
+        }
+        fout << endl;
+    }
+    fout.close();
+}

@@ -144,4 +144,60 @@ void executeJOIN()
             result->addPage(rowsResult);
         tableCatalogue.insertTable(result);
     }
+    else
+    {
+        int buckets = bufferSize - 1;
+        set<int> distinctValues;
+        unordered_set<int> distinctValuesT1 = T1->getDistinctValuesOfColumn(columnIndexT1);
+        unordered_set<int> distinctValuesT2 = T2->getDistinctValuesOfColumn(columnIndexT2);
+        for(auto valT1 : distinctValuesT1)
+            distinctValues.insert(valT1);
+        for(auto valT2 : distinctValuesT2)
+            distinctValues.insert(valT2);
+        map<int, int> mappedValue;
+        int cnt = 0;
+        for(auto val: distinctValues)
+            mappedValue[val] = cnt++;
+        vector<vector<vector<int>>> bucketRows(buckets);
+        vector<int> partitionSizesT1(buckets, 0);
+        vector<int> partitionSizesT2(buckets, 0);
+        Cursor cursorT1 = T1->getCursor();
+        for(int a = 0; a < T1->rowCount; a++)
+        {
+            vector<int> here = cursorT1.getNext();
+            int part = mappedValue[here[columnIndexT1]] % buckets;
+            bucketRows[part].push_back(here);
+            partitionSizesT1[part]++;
+            if(bucketRows[part].size() == T1->maxRowsPerBlock)
+            {
+                T1->writePartitions(bucketRows[part], part, partitionSizesT1[part] / T1->maxRowsPerBlock);
+                bucketRows[part].clear();
+            }
+        }
+        for(int a = 0; a < buckets; a++)
+            if(bucketRows[a].size())
+            {
+                T1->writePartitions(bucketRows[a], a, bucketRows[a].size() / T1->maxRowsPerBlock + 1);
+                bucketRows[a].clear();
+            }
+        Cursor cursorT2 = T2->getCursor();
+        for(int a = 0; a < T2->rowCount; a++)
+        {
+            vector<int> here = cursorT2.getNext();
+            int part = mappedValue[here[columnIndexT2]] % buckets;
+            bucketRows[part].push_back(here);
+            partitionSizesT2[part]++;
+            if(bucketRows[part].size() == T2->maxRowsPerBlock)
+            {
+                T2->writePartitions(bucketRows[part], part, partitionSizesT1[part] / T1->maxRowsPerBlock);
+                bucketRows[part].clear();
+            }
+        }
+        for(int a = 0; a < buckets; a++)
+            if(bucketRows[a].size())
+            {
+                T2->writePartitions(bucketRows[a], a, bucketRows[a].size() / T2->maxRowsPerBlock + 1);
+                bucketRows[a].clear();
+            }
+    }
 }
