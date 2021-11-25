@@ -177,7 +177,7 @@ void executeJOIN()
         for(int a = 0; a < buckets; a++)
             if(bucketRows[a].size())
             {
-                T1->writePartitions(bucketRows[a], a, bucketRows[a].size() / T1->maxRowsPerBlock + 1);
+                T1->writePartitions(bucketRows[a], a, partitionSizesT1[a] / T1->maxRowsPerBlock + 1);
                 bucketRows[a].clear();
             }
         Cursor cursorT2 = T2->getCursor();
@@ -189,14 +189,14 @@ void executeJOIN()
             partitionSizesT2[part]++;
             if(bucketRows[part].size() == T2->maxRowsPerBlock)
             {
-                T2->writePartitions(bucketRows[part], part, partitionSizesT1[part] / T1->maxRowsPerBlock);
+                T2->writePartitions(bucketRows[part], part, partitionSizesT2[part] / T2->maxRowsPerBlock);
                 bucketRows[part].clear();
             }
         }
         for(int a = 0; a < buckets; a++)
             if(bucketRows[a].size())
             {
-                T2->writePartitions(bucketRows[a], a, bucketRows[a].size() / T2->maxRowsPerBlock + 1);
+                T2->writePartitions(bucketRows[a], a, partitionSizesT2[a] / T2->maxRowsPerBlock + 1);
                 bucketRows[a].clear();
             }
         // buckets are made now, need to iterate through them and do
@@ -212,6 +212,7 @@ void executeJOIN()
         if(rows.size())
             result->addPage(rows);
         tableCatalogue.insertTable(result);
+        // system("rm ../data/temp/*part*");
     }
 }
 
@@ -236,7 +237,8 @@ void nestedJOINpartition(Table* T1, Table* T2, Table* result, int part, int colu
             {
                 vector<vector<int>> here = pagesT1[b].getRows();
                 for(auto row: here)
-                    rowsT1.push_back(row);
+                    if(row[0] != 0)
+                        rowsT1.push_back(row);
             }
             for(int b = 0; b < numPagesT2; b++)
             {
@@ -279,7 +281,8 @@ void nestedJOINpartition(Table* T1, Table* T2, Table* result, int part, int colu
         {
             vector<vector<int>> here = pagesT1[b].getRows();
             for(auto row: here)
-                rowsT1.push_back(row);
+                if(row[0] != 0)
+                    rowsT1.push_back(row);
         }
         for(int b = 0; b < numPagesT2; b++)
         {

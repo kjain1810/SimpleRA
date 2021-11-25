@@ -1,0 +1,9 @@
+LOAD T1
+LOAD T2
+result2 <- JOIN USING NESTED T1, T2 ON a == k BUFFER 5
+EXPORT result2
+CLEAR result2
+result3 <- JOIN USING PARTHASH T1, T2 ON a == k BUFFER 5
+EXPORT result3
+CLEAR result3
+QUIT
