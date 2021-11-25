@@ -51,6 +51,30 @@ Page::Page(string tableName, int pageIndex)
     fin.close();
 }
 
+Page::Page(string tableName, int partIndex, int pageIndex, int partSize)
+{
+    logger.log("Page::Page");
+    this->tableName = tableName;
+    this->pageIndex = pageIndex;
+    this->partitionIndex = partIndex;
+    this->pageName = "../data/temp/" + this->tableName + "_part" + to_string(partIndex) + "_Page" + to_string(pageIndex);
+    Table table = *tableCatalogue.getTable(tableName);
+    this->columnCount = table.columnCount;
+    uint maxRowCount = table.maxRowsPerBlock;
+    vector<int> row(columnCount, 0);
+    this->rowCount = partSize;
+    this->rows.assign(this->rowCount, row);
+    ifstream fin(pageName, ios::in);
+    int number;
+    for(uint rowCounter = 0; rowCounter < this->rowCount; rowCounter++)
+        for(int columnCounter = 0; columnCounter < this->columnCount; columnCounter++)
+        {
+            fin >> number;
+            this->rows[rowCounter][columnCounter] = number;
+        }
+    fin.close();
+}
+
 /**
  * @brief Get row from page indexed by rowIndex
  * 
@@ -65,6 +89,11 @@ vector<int> Page::getRow(int rowIndex)
     if (rowIndex >= this->rowCount)
         return result;
     return this->rows[rowIndex];
+}
+
+vector<vector<int>> Page::getRows()
+{
+    return this->rows;
 }
 
 Page::Page(string tableName, int pageIndex, vector<vector<int>> rows, int rowCount)

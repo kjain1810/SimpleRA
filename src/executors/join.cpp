@@ -199,5 +199,119 @@ void executeJOIN()
                 T2->writePartitions(bucketRows[a], a, bucketRows[a].size() / T2->maxRowsPerBlock + 1);
                 bucketRows[a].clear();
             }
+        // buckets are made now, need to iterate through them and do
+        // nested join on these partitions
+        vector<vector<int>> rows;
+        for(int a = 0; a < buckets; a++)
+        {
+            if(partitionSizesT1[a] < partitionSizesT2[a])
+                nestedJOINpartition(T1, T2, result, a, columnIndexT1, columnIndexT2, partitionSizesT1[a], partitionSizesT2[a], bufferSize, false, rows);
+            else
+                nestedJOINpartition(T2, T1, result, a, columnIndexT2, columnIndexT1, partitionSizesT2[a], partitionSizesT1[a], bufferSize, true, rows);
+        }
+        if(rows.size())
+            result->addPage(rows);
+        tableCatalogue.insertTable(result);
+    }
+}
+
+void nestedJOINpartition(Table* T1, Table* T2, Table* result, int part, int columnIndexT1, int columnIndexT2, int partSizeT1, int partSizeT2, int bufferSize, bool swap, vector<vector<int>> &rows)
+{
+    int numPagesT1 = (partSizeT1 + T1->maxRowsPerBlock - 1) / T1->maxRowsPerBlock;
+    int numPagesT2 = (partSizeT2 + T2->maxRowsPerBlock - 1) / T2->maxRowsPerBlock;
+    int loadedT1 = 0;
+    vector<Page> pagesT1;
+    for(int a = 0; a < numPagesT1; a++)
+    {
+        int partSize = T1->maxRowsPerBlock;
+        if(a == numPagesT1 - 1)
+            partSize = partSizeT1 % T1->maxRowsPerBlock;
+        if(partSize == 0)
+            partSize = T1->maxRowsPerBlock;
+        pagesT1.push_back(bufferManager.getPartitionPage(T1->tableName, part, a + 1, partSize));
+        if(pagesT1.size() == bufferSize - 2)
+        {
+            vector<vector<int>> rowsT1;
+            for(int b = 0; b < pagesT1.size(); b++)
+            {
+                vector<vector<int>> here = pagesT1[b].getRows();
+                for(auto row: here)
+                    rowsT1.push_back(row);
+            }
+            for(int b = 0; b < numPagesT2; b++)
+            {
+                int partSize2 = T2->maxRowsPerBlock;
+                if(b == numPagesT2 - 1)
+                    partSize2 = partSizeT2 % T2->maxRowsPerBlock;
+                if(partSize2 == 0)
+                    partSize2 = T2->maxRowsPerBlock;
+                Page pageT2 = bufferManager.getPartitionPage(T2->tableName, part, b + 1, partSize2);
+                vector<vector<int>> rowsT2 = pageT2.getRows();
+                for(auto rowT1: rowsT1)
+                    for(auto rowT2: rowsT2)
+                        if(rowT1[columnIndexT1] == rowT2[columnIndexT2])
+                        {
+                            vector<int>here;
+                            if(swap)
+                            {
+                                for(auto valT2: rowT2)
+                                    here.push_back(valT2);
+                                for(auto valT1: rowT1)
+                                    here.push_back(valT1);
+                            }
+                            else
+                            {
+                                for(auto valT1: rowT1)
+                                    here.push_back(valT1);
+                                for(auto valT2: rowT2)
+                                    here.push_back(valT2);
+                            }
+                            result->addRow(here, rows);
+                        }
+            }
+            pagesT1.clear();
+        }
+    }
+    if(pagesT1.size())
+    {
+        vector<vector<int>> rowsT1;
+        for(int b = 0; b < pagesT1.size(); b++)
+        {
+            vector<vector<int>> here = pagesT1[b].getRows();
+            for(auto row: here)
+                rowsT1.push_back(row);
+        }
+        for(int b = 0; b < numPagesT2; b++)
+        {
+            int partSize2 = T2->maxRowsPerBlock;
+            if(b == numPagesT2 - 1)
+                partSize2 = partSizeT2 % T2->maxRowsPerBlock;
+            if(partSize2 == 0)
+                partSize2 = T2->maxRowsPerBlock;
+            Page pageT2 = bufferManager.getPartitionPage(T2->tableName, part, b + 1, partSize2);
+            vector<vector<int>> rowsT2 = pageT2.getRows();
+            for(auto rowT1: rowsT1)
+                for(auto rowT2: rowsT2)
+                    if(rowT1[columnIndexT1] == rowT2[columnIndexT2])
+                    {
+                        vector<int>here;
+                        if(swap)
+                        {
+                            for(auto valT2: rowT2)
+                                here.push_back(valT2);
+                            for(auto valT1: rowT1)
+                                here.push_back(valT1);
+                        }
+                        else
+                        {
+                            for(auto valT1: rowT1)
+                                here.push_back(valT1);
+                            for(auto valT2: rowT2)
+                                here.push_back(valT2);
+                        }
+                        result->addRow(here, rows);
+                    }
+        }
+        pagesT1.clear();
     }
 }

@@ -23,6 +23,15 @@ Page BufferManager::getPage(string tableName, int pageIndex)
         return this->insertIntoPool(tableName, pageIndex);
 }
 
+Page BufferManager::getPartitionPage(string tableName, int partitionIndex, int pageIndex, int partSize)
+{
+    logger.log("BufferManager::getPartitionPage");
+    string pageName = "../data/temp/" + tableName + "_part" + to_string(partitionIndex) + "_Page" + to_string(pageIndex);
+    if(this->inPool(pageName))
+        return this->getFromPool(pageName);
+    return this->insertPartitionIntoPool(tableName, partitionIndex, pageIndex, partSize);
+}
+
 /**
  * @brief Checks to see if a page exists in the pool
  *
@@ -71,6 +80,16 @@ Page BufferManager::insertIntoPool(string tableName, int pageIndex)
     logger.log("BufferManager::insertIntoPool");
     Page page(tableName, pageIndex);
     if (this->pages.size() >= BLOCK_COUNT)
+        pages.pop_front();
+    pages.push_back(page);
+    return page;
+}
+
+Page BufferManager::insertPartitionIntoPool(string tableName, int partIndex, int pageIdx, int partSize)
+{
+    logger.log("BufferManager::insertPartitionIntoPool");
+    Page page(tableName, partIndex, pageIdx, partSize);
+    if(this->pages.size() >= BLOCK_COUNT)
         pages.pop_front();
     pages.push_back(page);
     return page;

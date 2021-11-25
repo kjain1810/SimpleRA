@@ -141,10 +141,9 @@ bool Table::blockify()
         this->rowsPerBlockCount.emplace_back(pageCounter);
         pageCounter = 0;
     }
-
     if (this->rowCount == 0)
         return false;
-    this->distinctValuesInColumns.clear();
+    // this->distinctValuesInColumns.clear();
     return true;
 }
 

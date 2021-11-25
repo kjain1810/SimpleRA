@@ -10,6 +10,7 @@ void executeDISTINCT();
 void executeEXPORT();
 void executeINDEX();
 void executeJOIN();
+void nestedJOINpartition(Table* T1, Table* T2, Table* result, int part, int columnIndexT1, int columnIndexT2, int partSizeT1, int partSizeT2, int bufferSize, bool swap, vector<vector<int>> &rows);
 void executeLIST();
 void executeLOAD();
 void executePRINT();
