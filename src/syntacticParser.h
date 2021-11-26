@@ -20,7 +20,8 @@ enum QueryType
     SELECTION,
     SORT,
     SOURCE,
-    UNDETERMINED
+    UNDETERMINED,
+    GROUP
 };
 
 enum BinaryOperator
@@ -78,6 +79,11 @@ public:
     string joinSecondColumnName = "";
     string joinBufferSize = "";
 
+    string groupResultRelationName = "";
+    string groupAttribute = "";
+    string groupRelationName = "";
+    string groupType = "";
+
     string loadRelationName = "";
 
     string printRelationName = "";
@@ -124,6 +130,7 @@ bool syntacticParseRENAME();
 bool syntacticParseSELECTION();
 bool syntacticParseSORT();
 bool syntacticParseSOURCE();
+bool syntacticParseGROUP();
 
 bool isFileExists(string tableName);
 bool isQueryFile(string fileName);
