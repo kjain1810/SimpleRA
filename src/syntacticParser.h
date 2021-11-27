@@ -83,6 +83,7 @@ public:
     string groupAttribute = "";
     string groupRelationName = "";
     string groupType = "";
+    string groupApplyAttribute = "";
 
     string loadRelationName = "";
 
