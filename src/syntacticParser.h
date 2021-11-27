@@ -109,6 +109,7 @@ public:
     string sortResultRelationName = "";
     string sortColumnName = "";
     string sortRelationName = "";
+    string sortBufferSize = "";
 
     string sourceFileName = "";
 
