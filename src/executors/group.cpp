@@ -3,7 +3,7 @@
 bool syntacticParseGROUP()
 {
     logger.log("syntacticParseGROUP");
-    if(tokenizedQuery.size() != 9)
+    if(tokenizedQuery.size() != 9 || tokenizedQuery[3] != "BY" || tokenizedQuery[5] != "FROM" || tokenizedQuery[7] != "RETURN")
     {
         cout << "SYNTAC ERROR" << endl;
         cout << "Size: " << tokenizedQuery.size() << endl;
