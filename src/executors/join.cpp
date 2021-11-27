@@ -7,10 +7,9 @@
 bool syntacticParseJOIN()
 {
     logger.log("syntacticParseJOIN");
-    if (tokenizedQuery.size() != 13 || tokenizedQuery[7] != "ON" || tokenizedQuery[11] != "BUFFER")
+    if (tokenizedQuery.size() != 13 || tokenizedQuery[3] != "USING" || tokenizedQuery[7] != "ON" || tokenizedQuery[11] != "BUFFER")
     {
         cout << "SYNTAC ERROR" << endl;
-        cout << "Size: " << tokenizedQuery.size() << "\n";
         return false;
     }
     parsedQuery.queryType = JOIN;
@@ -65,6 +64,15 @@ bool semanticParseJOIN()
         return false;
     }
 
+    auto it = parsedQuery.joinBufferSize.begin();
+    while(it != parsedQuery.joinBufferSize.end() && isdigit(*it))
+        it++;
+    if(it != parsedQuery.joinBufferSize.end())
+    {
+        cout << "SEMANTIC ERROR: Buffer size needs to be an integer\n";
+        return false;
+    }
+    
     if(atoi(parsedQuery.joinBufferSize.c_str()) < 3)
     {
         cout << "SEMANTIC ERROR: Buffer size should be atleast 3\n";
