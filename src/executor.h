@@ -17,6 +17,8 @@ void executePRINT();
 void executePROJECTION();
 void executeRENAME();
 void executeSELECTION();
+Table *sort_phase();
+void merge_phase(Table* result);
 void executeSORT();
 void executeSOURCE();
 void executeGROUP();

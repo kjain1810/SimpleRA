@@ -103,8 +103,29 @@ bool semanticParseSORT()
     return true;
 }
 
+Table* sort_phase()
+{
+    Table *T = new Table(parsedQuery.sortRelationName);
+    int columnIndex = T->getColumnIndex(parsedQuery.sortColumnName);
+    Table *result = new Table(parsedQuery.sortResultRelationName, T->columns);
+    vector<vector<int>> rows;
+    Cursor cursor = T->getCursor();
+    for(int a = 0; a < T->rowCount; a++)
+    {
+        vector<int> here = cursor.getNext();
+        result->addRowSorted(here, rows, columnIndex);
+    }
+    return result;
+}
+
+void merge_phase(Table* result)
+{
+    
+}
+
 void executeSORT()
 {
     logger.log("executeSORT");
-    return;
+    Table *result = sort_phase();
+    merge_phase(result);
 }

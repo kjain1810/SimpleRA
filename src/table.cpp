@@ -354,6 +354,20 @@ void Table::addRow(vector<int> newRow, vector<vector<int>> &rows)
         this->addPage(rows);
 }
 
+void Table::addRowSorted(vector<int> newRow, vector<vector<int>> &rows, int idx)
+{
+    logger.log("Table::addRowSorted");
+    rows.push_back(newRow);
+    int cur = rows.size() - 1;
+    while(cur > 0 && rows[cur][idx] < rows[cur - 1][idx])
+    {
+        swap(rows[cur], rows[cur - 1]);
+        cur--;
+    }
+    if(rows.size() == this->maxRowsPerBlock)
+        this->addPage(rows);
+}
+
 unordered_set<int> Table::getDistinctValuesOfColumn(int column)
 {
     logger.log("Table::getDitinctValueOfColumn");

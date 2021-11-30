@@ -53,6 +53,7 @@ public:
     int getColumnIndex(string columnName);
     void unload();
     void addRow(vector<int> newRow, vector<vector<int>> &rows);
+    void addRowSorted(vector<int> newRow, vector<vector<int>> &rows, int idx);
     void addPage(vector<vector<int>> &rows);
     unordered_set<int> getDistinctValuesOfColumn(int column);
     void writePartitions(vector<vector<int>> rows, int partNumber, int idx);
